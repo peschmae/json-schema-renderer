@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/peschmae/json-schema-renderer/pkg/renderer"
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
@@ -21,9 +22,9 @@ func (AsciiDocRenderer) PropertyHeader(title string, level int) string {
 
 func (AsciiDocRenderer) TableHeader() string {
 
-	return `[cols="1,1,1"]
+	return `[cols="1,1,1,1"]
 |===
-|Name |Type |Description
+|Name |Type |Default |Description
 
 `
 
@@ -37,7 +38,7 @@ func (AsciiDocRenderer) PropertyRow(parent string, schema jsonschema.Schema) str
 
 	if schema.Types.String() != "[object]" {
 
-		return fmt.Sprintf("|%s |%s |%s\n", schema.Title, strings.Join(schema.Types.ToStrings(), ", "), schema.Description)
+		return fmt.Sprintf("|%s |%s |%s |%s\n", schema.Title, strings.Join(schema.Types.ToStrings(), ", "), renderer.GetValue(schema), schema.Description)
 	}
 
 	id := strings.ToLower(schema.Title)
@@ -45,5 +46,5 @@ func (AsciiDocRenderer) PropertyRow(parent string, schema jsonschema.Schema) str
 		id = strings.ToLower(strings.ReplaceAll(parent, " > ", "-")) + "-" + strings.ToLower(schema.Title)
 	}
 
-	return fmt.Sprintf("|<<%s,%s>> |%s |%s\n", id, schema.Title, strings.Join(schema.Types.ToStrings(), ", "), schema.Description)
+	return fmt.Sprintf("|<<%s,%s>> |%s |%s |%s\n", id, schema.Title, strings.Join(schema.Types.ToStrings(), ", "), "", schema.Description)
 }

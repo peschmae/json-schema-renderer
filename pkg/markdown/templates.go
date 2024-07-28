@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/peschmae/json-schema-renderer/pkg/renderer"
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
@@ -21,8 +22,8 @@ func (MarkdownRenderer) PropertyHeader(title string, level int) string {
 
 func (MarkdownRenderer) TableHeader() string {
 
-	return `| Name | Type | Description |
-| :------ | :------: | :------------- |
+	return `| Name | Type | Default | Description |
+| :------ | :------: | :------------- | :------------- |
 `
 
 }
@@ -36,7 +37,7 @@ func (MarkdownRenderer) PropertyRow(parent string, schema jsonschema.Schema) str
 	description := strings.ReplaceAll(schema.Description, "\n", "<br>")
 
 	if schema.Types.String() != "[object]" {
-		return fmt.Sprintf("| %s | %s | %s |\n", schema.Title, strings.Join(schema.Types.ToStrings(), ", "), description)
+		return fmt.Sprintf("| %s | %s | %s | %s |\n", schema.Title, strings.Join(schema.Types.ToStrings(), ", "), renderer.GetValue(schema), description)
 	}
 
 	id := strings.ToLower(schema.Title)
@@ -44,6 +45,6 @@ func (MarkdownRenderer) PropertyRow(parent string, schema jsonschema.Schema) str
 		id = strings.ToLower(strings.ReplaceAll(parent, " > ", "-")) + "-" + strings.ToLower(schema.Title)
 	}
 
-	return fmt.Sprintf("| [%s](#%s) | %s | %s |\n", schema.Title, id, strings.Join(schema.Types.ToStrings(), ", "), description)
+	return fmt.Sprintf("| [%s](#%s) | %s | %s | %s |\n", schema.Title, id, strings.Join(schema.Types.ToStrings(), ", "), "", description)
 
 }
