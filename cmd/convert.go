@@ -37,10 +37,10 @@ func convertToAsciiDoc(input, outFile string) error {
 	output := ""
 
 	// print schema
-	output += r.PropertyHeader("Root Schema \n", 0)
+	output += r.Header("Root Schema", 0)
 	output += r.TableHeader()
 	for _, sch := range schema.Properties {
-		output += r.PropertyRow(*sch)
+		output += r.PropertyRow("", *sch)
 		gatherObjects("", sch)
 	}
 	output += r.TableFooter()
@@ -48,17 +48,23 @@ func convertToAsciiDoc(input, outFile string) error {
 
 	// print all schemas
 	// sort keys
-	keys := make([]string, 0, len(objects))
+	objectsKeys := make([]string, 0, len(objects))
 	for k := range objects {
-		keys = append(keys, k)
+		objectsKeys = append(objectsKeys, k)
 	}
-	sort.Strings(keys)
+	sort.Strings(objectsKeys)
 
-	for _, key := range keys {
-		output += r.PropertyHeader(fmt.Sprintf("Schema: %s \n", key), strings.Count(key, ">"))
+	for _, key := range objectsKeys {
+		output += r.PropertyHeader(key, strings.Count(key, ">"))
 		output += r.TableHeader()
-		for _, s := range objects[key].Properties {
-			output += r.PropertyRow(*s)
+		propertyKeys := make([]string, 0, len(objects[key].Properties))
+		for k := range objects[key].Properties {
+			propertyKeys = append(propertyKeys, k)
+		}
+		sort.Strings(propertyKeys)
+
+		for _, s := range propertyKeys {
+			output += r.PropertyRow(key, *objects[key].Properties[s])
 		}
 		output += r.TableFooter()
 		output += "\n"
