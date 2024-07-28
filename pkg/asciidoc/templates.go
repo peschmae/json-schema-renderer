@@ -16,7 +16,7 @@ type Renderer interface {
 type AsciiDocRenderer struct{}
 
 func (AsciiDocRenderer) PropertyHeader(title string, level int) string {
-	return "\n" + strings.Repeat("=", level) + " " + title + "\n"
+	return "\n" + strings.Repeat("=", level+1) + " " + title + "\n"
 }
 
 func (AsciiDocRenderer) TableHeader() string {

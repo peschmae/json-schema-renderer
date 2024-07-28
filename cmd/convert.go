@@ -34,16 +34,16 @@ func convertToAsciiDoc(input string) error {
 		return err
 	}
 
-	renderer := asciidoc.AsciiDocRenderer{}
+	r := asciidoc.AsciiDocRenderer{}
 
 	// print schema
-	output = renderer.PropertyHeader("Root Schema", 1)
-	output += renderer.TableHeader()
+	output += r.PropertyHeader("Root Schema", 0)
+	output += r.TableHeader()
 	for _, sch := range schema.Properties {
-		renderer.PropertyRow(*sch)
+		output += r.PropertyRow(*sch)
 		gatherObjects("", sch)
 	}
-	output += renderer.TableFooter()
+	output += r.TableFooter()
 	output += "\n"
 
 	// print all schemas
@@ -55,12 +55,12 @@ func convertToAsciiDoc(input string) error {
 	sort.Strings(keys)
 
 	for _, key := range keys {
-		output += renderer.PropertyHeader(fmt.Sprintf("Schema: %s \n", key), 1)
-		output += renderer.TableHeader()
+		output += r.PropertyHeader(fmt.Sprintf("Schema: %s \n", key), strings.Count(key, ">"))
+		output += r.TableHeader()
 		for _, s := range objects[key].Properties {
-			output += renderer.PropertyRow(*s)
+			output += r.PropertyRow(*s)
 		}
-		output += renderer.TableFooter()
+		output += r.TableFooter()
 		output += "\n"
 	}
 
@@ -82,7 +82,6 @@ func gatherObjects(parentTitle string, schema *jsonschema.Schema) {
 
 		for _, sch := range schema.Properties {
 			if sch.Types.String() == "[object]" {
-				objects[name] = *sch
 				gatherObjects(name, sch)
 			}
 		}
