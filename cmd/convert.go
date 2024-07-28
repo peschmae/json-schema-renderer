@@ -28,7 +28,7 @@ func validateInput(input string) error {
 	return nil
 }
 
-func renderDoc(input, outFile, format string) error {
+func renderDoc(input, outFile, format, title string) error {
 	c := jsonschema.NewCompiler()
 	schema, err := c.Compile(input)
 	if err != nil {
@@ -45,7 +45,7 @@ func renderDoc(input, outFile, format string) error {
 	output := ""
 
 	// print schema
-	output += r.Header("Root Schema", 0)
+	output += r.Header(title, 0)
 	output += r.TableHeader()
 	for _, sch := range schema.Properties {
 		output += r.PropertyRow("", *sch)

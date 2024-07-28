@@ -36,6 +36,7 @@
             "console": "integratedTerminal",
             "args": [
                 "values.schema.json",
+                "-t ArgoCD Helm Values",
                 "-o rendered.adoc"
             ]
         },

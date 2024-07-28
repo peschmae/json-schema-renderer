@@ -23,8 +23,9 @@ var rootCmd = &cobra.Command{
 
 		output := strings.Trim(cmd.Flag("output").Value.String(), " ")
 		format := strings.Trim(cmd.Flag("format").Value.String(), " ")
+		title := strings.Trim(cmd.Flag("title").Value.String(), " ")
 
-		return renderDoc(inputFile, output, format)
+		return renderDoc(inputFile, output, format, title)
 	},
 }
 
@@ -41,4 +42,6 @@ func init() {
 	rootCmd.Flags().StringP("output", "o", "", "Output file")
 
 	rootCmd.Flags().StringP("format", "f", "asciidoc", "Output format (asciidoc, markdown)")
+
+	rootCmd.Flags().StringP("title", "t", "Root Schema", "Title of the document")
 }
