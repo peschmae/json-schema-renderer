@@ -6,13 +6,6 @@ import (
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
-type Renderer interface {
-	PropertyHeader(string, int) string
-	TableHeader() string
-	TableFooter() string
-	PropertyRow(jsonschema.Schema) string
-}
-
 type AsciiDocRenderer struct{}
 
 func (AsciiDocRenderer) Header(title string, level int) string {

@@ -1,4 +1,4 @@
-module github.com/peschmae/json-schema-to-asciidoc
+module github.com/peschmae/json-schema-renderer
 
 go 1.22.5
 

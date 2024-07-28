@@ -9,7 +9,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/peschmae/json-schema-to-asciidoc/pkg/asciidoc"
+	"github.com/peschmae/json-schema-renderer/pkg/asciidoc"
+	"github.com/peschmae/json-schema-renderer/pkg/markdown"
+	"github.com/peschmae/json-schema-renderer/pkg/renderer"
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
@@ -26,14 +28,20 @@ func validateInput(input string) error {
 	return nil
 }
 
-func convertToAsciiDoc(input, outFile string) error {
+func renderDoc(input, outFile, format string) error {
 	c := jsonschema.NewCompiler()
 	schema, err := c.Compile(input)
 	if err != nil {
 		return err
 	}
 
-	r := asciidoc.AsciiDocRenderer{}
+	var r renderer.Renderer
+	if format == "markdown" {
+		r = markdown.MarkdownRenderer{}
+	} else {
+		r = asciidoc.AsciiDocRenderer{}
+	}
+
 	output := ""
 
 	// print schema

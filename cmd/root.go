@@ -5,13 +5,14 @@ package cmd
 
 import (
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "json-schema-to-asciidoc",
+	Use:   "json-schema-renderer",
 	Short: "Convert a json schema to an asciidoc file",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -20,7 +21,10 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		return convertToAsciiDoc(inputFile, cmd.Flag("output").Value.String())
+		output := strings.Trim(cmd.Flag("output").Value.String(), " ")
+		format := strings.Trim(cmd.Flag("format").Value.String(), " ")
+
+		return renderDoc(inputFile, output, format)
 	},
 }
 
@@ -35,4 +39,6 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().StringP("output", "o", "", "Output file")
+
+	rootCmd.Flags().StringP("format", "f", "asciidoc", "Output format (asciidoc, markdown)")
 }
