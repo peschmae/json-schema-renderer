@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 
@@ -13,8 +14,6 @@ import (
 )
 
 var objects = make(map[string]jsonschema.Schema)
-
-var output string
 
 func validateInput(input string) error {
 
@@ -27,7 +26,7 @@ func validateInput(input string) error {
 	return nil
 }
 
-func convertToAsciiDoc(input string) error {
+func convertToAsciiDoc(input, outFile string) error {
 	c := jsonschema.NewCompiler()
 	schema, err := c.Compile(input)
 	if err != nil {
@@ -35,9 +34,10 @@ func convertToAsciiDoc(input string) error {
 	}
 
 	r := asciidoc.AsciiDocRenderer{}
+	output := ""
 
 	// print schema
-	output += r.PropertyHeader("Root Schema", 0)
+	output += r.PropertyHeader("Root Schema \n", 0)
 	output += r.TableHeader()
 	for _, sch := range schema.Properties {
 		output += r.PropertyRow(*sch)
@@ -64,7 +64,33 @@ func convertToAsciiDoc(input string) error {
 		output += "\n"
 	}
 
-	fmt.Print(output)
+	if outFile != "" {
+		// write to file
+		err := writeToFile(outFile, output)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Output written to %s\n", outFile)
+
+	} else {
+		fmt.Print(output)
+	}
+
+	return nil
+}
+
+func writeToFile(outFile, output string) error {
+	outFile = strings.Trim(outFile, " ")
+	f, err := os.Create(outFile)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	_, err = f.WriteString(output)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

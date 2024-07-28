@@ -13,12 +13,14 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "json-schema-to-asciidoc",
 	Short: "Convert a json schema to an asciidoc file",
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := validateInput(cmd.Flag("input").Value.String()); err != nil {
+		inputFile := args[0]
+		if err := validateInput(inputFile); err != nil {
 			return err
 		}
 
-		return convertToAsciiDoc(cmd.Flag("input").Value.String())
+		return convertToAsciiDoc(inputFile, cmd.Flag("output").Value.String())
 	},
 }
 
@@ -32,9 +34,5 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().StringP("input", "i", "", "Input file")
 	rootCmd.Flags().StringP("output", "o", "", "Output file")
-
-	rootCmd.MarkFlagRequired("input")
-	rootCmd.MarkFlagRequired("output")
 }

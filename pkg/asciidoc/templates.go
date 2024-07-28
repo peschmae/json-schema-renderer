@@ -21,7 +21,7 @@ func (AsciiDocRenderer) PropertyHeader(title string, level int) string {
 
 func (AsciiDocRenderer) TableHeader() string {
 
-	return `[cols="1,1"]
+	return `[cols="1,1,1"]
 |===
 |Name |Type |Description
 
