@@ -1,5 +1,6 @@
 *.adoc
 *.md
+!README.md
 values.schema.json
 
 json-schema-renderer

@@ -4,6 +4,8 @@ Copyright © 2024 Mathias Petermann <mathias.petermann@gmail.com>
 package cmd
 
 import (
+	"bufio"
+	"log"
 	"os"
 	"strings"
 
@@ -14,10 +16,52 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "json-schema-renderer",
 	Short: "Convert a json schema to an asciidoc file",
-	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		inputFile := args[0]
-		if err := validateInput(inputFile); err != nil {
+		var inputFile string
+
+		// check if there is somethinig to read on STDIN
+		stat, _ := os.Stdin.Stat()
+		if (stat.Mode() & os.ModeCharDevice) == 0 {
+			// read from stdin
+			scanner := bufio.NewScanner(os.Stdin)
+
+			var lines []string
+			for {
+				scanner.Scan()
+				line := scanner.Text()
+				if len(line) == 0 {
+					break
+				}
+				lines = append(lines, line)
+			}
+
+			err := scanner.Err()
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// join lines with a linebreak to make it a valid yaml
+			stdin := []byte(strings.Join(lines, "\n"))
+
+			// create a temporary file
+			tempFile, err := os.CreateTemp(os.TempDir(), "json-schema-renderer-")
+			if err != nil {
+				return err
+			}
+			defer os.Remove(tempFile.Name())
+
+			// write the stdin to the temporary file
+			if _, err := tempFile.Write(stdin); err != nil {
+				return err
+			}
+
+			inputFile = tempFile.Name()
+
+		} else {
+			inputFile = args[0]
+		}
+
+		if err := validateInputFile(inputFile); err != nil {
 			return err
 		}
 

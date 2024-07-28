@@ -17,10 +17,10 @@ import (
 
 var objects = make(map[string]jsonschema.Schema)
 
-func validateInput(input string) error {
+func validateInputFile(inputFile string) error {
 
 	c := jsonschema.NewCompiler()
-	_, err := c.Compile(input)
+	_, err := c.Compile(inputFile)
 	if err != nil {
 		return err
 	}
