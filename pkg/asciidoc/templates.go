@@ -13,12 +13,12 @@ import (
 type AsciiDocRenderer struct{}
 
 func (AsciiDocRenderer) Header(title string, level int) string {
-	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("=", int(math.Max(6, float64(level+1)))), title)
+	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("=", int(math.Min(6, float64(level+1)))), title)
 }
 
 func (a AsciiDocRenderer) PropertyHeader(title string, level int) string {
 
-	return fmt.Sprintf("\n[#%s]\n%s Property: %s\n\n", a.propertyId("", title), strings.Repeat("=", int(math.Max(6, float64(level+1)))), title)
+	return fmt.Sprintf("\n[#%s]\n%s Property: %s\n\n", a.propertyId("", title), strings.Repeat("=", int(math.Min(6, float64(level+1)))), title)
 }
 
 func (AsciiDocRenderer) TableHeader() string {
