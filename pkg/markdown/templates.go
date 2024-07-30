@@ -2,6 +2,7 @@ package markdown
 
 import (
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/peschmae/json-schema-renderer/pkg/renderer"
@@ -11,13 +12,13 @@ import (
 type MarkdownRenderer struct{}
 
 func (MarkdownRenderer) Header(title string, level int) string {
-	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("#", level+1), title)
+	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("#", int(math.Max(6, float64(level+1)))), title)
 }
 
 func (MarkdownRenderer) PropertyHeader(title string, level int) string {
 	id := strings.ToLower(strings.ReplaceAll(title, " > ", "-"))
 
-	return fmt.Sprintf("\n%s <a name=\"%s\"></a> Property: %s\n\n", strings.Repeat("#", level+1), id, title)
+	return fmt.Sprintf("\n%s <a name=\"%s\"></a> Property: %s\n\n", strings.Repeat("#", int(math.Max(6, float64(level+1)))), id, title)
 }
 
 func (MarkdownRenderer) TableHeader() string {
