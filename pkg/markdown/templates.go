@@ -17,7 +17,7 @@ func (MarkdownRenderer) Header(title string, level int) string {
 func (MarkdownRenderer) PropertyHeader(title string, level int) string {
 	id := strings.ToLower(strings.ReplaceAll(title, " > ", "-"))
 
-	return fmt.Sprintf("\n%s <a name=\"%s\"></a> Property: %s\n\n", strings.Repeat("#", level+1), id, title)
+	return fmt.Sprintf("\n%s <a name=\"%s\"></a> Property: %s\n\n", strings.Repeat("#", level+2), id, title)
 }
 
 func (MarkdownRenderer) TableHeader() string {

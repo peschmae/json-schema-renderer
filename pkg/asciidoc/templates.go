@@ -17,7 +17,7 @@ func (AsciiDocRenderer) Header(title string, level int) string {
 func (AsciiDocRenderer) PropertyHeader(title string, level int) string {
 	id := strings.ToLower(strings.ReplaceAll(title, " > ", "-"))
 
-	return fmt.Sprintf("\n[#%s]\n%s Property: %s\n\n", id, strings.Repeat("=", level+1), title)
+	return fmt.Sprintf("\n[#%s]\n%s Property: %s\n\n", id, strings.Repeat("=", level+2), title)
 }
 
 func (AsciiDocRenderer) TableHeader() string {
