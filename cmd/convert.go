@@ -63,7 +63,7 @@ func renderDoc(input, outFile, format, title string) error {
 	sort.Strings(objectsKeys)
 
 	for _, key := range objectsKeys {
-		output += r.PropertyHeader(key, strings.Count(key, ">"))
+		output += r.PropertyHeader(key, strings.Count(key, ">")+1)
 		output += r.TableHeader()
 		propertyKeys := make([]string, 0, len(objects[key].Properties))
 		for k := range objects[key].Properties {
