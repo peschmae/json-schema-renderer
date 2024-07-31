@@ -56,6 +56,6 @@ func (AsciiDocRenderer) propertyId(parent, title string) string {
 	if parent != "" {
 		return strings.ToLower(strings.ReplaceAll(parent, " > ", "-")) + "-" + strings.ToLower(title)
 	} else {
-		return strings.ToLower(title)
+		return strings.ToLower(strings.ReplaceAll(title, " > ", "-"))
 	}
 }
