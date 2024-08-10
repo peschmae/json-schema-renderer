@@ -13,6 +13,7 @@ type Renderer interface {
 	TableHeader() string
 	TableFooter() string
 	PropertyRow(string, jsonschema.Schema, bool) string
+	TextParagraph(string) string
 }
 
 func GetValue(schema jsonschema.Schema) string {

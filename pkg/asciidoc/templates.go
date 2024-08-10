@@ -52,6 +52,10 @@ func (a AsciiDocRenderer) PropertyRow(parent string, schema jsonschema.Schema, m
 	return fmt.Sprintf("|%s |%s |%s |%s\n", a.link(a.propertyId(parent, schema.Title), schema.Title), strings.Join(schema.Types.ToStrings(), ", "), "", descr)
 }
 
+func (AsciiDocRenderer) TextParagraph(text string) string {
+	return strings.ReplaceAll(text, "\n", " +\n") + "\n\n"
+}
+
 func (a AsciiDocRenderer) dumpPropertiesToValue(properties map[string]*jsonschema.Schema) string {
 
 	jsonString := renderer.DumpPropertiesToJson(properties)

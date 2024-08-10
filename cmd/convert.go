@@ -67,6 +67,11 @@ func renderDoc(input, outFile, format, title string, depth int, flatObjects []st
 
 		if depth == 0 || strings.Count(key, ">") <= depth {
 			output += r.PropertyHeader(key, strings.Count(key, ">")+1)
+
+			if objects[key].Description != "" {
+				output += r.TextParagraph(objects[key].Description)
+			}
+
 			output += r.TableHeader()
 
 			propertyKeys := make([]string, 0, len(objects[key].Properties))
@@ -81,6 +86,7 @@ func renderDoc(input, outFile, format, title string, depth int, flatObjects []st
 				if slices.Contains(flatObjects, s) {
 					dumpValue = true
 				} else if depth == 0 {
+					// avoid dumping first level objects if depth is 0
 					dumpValue = false
 				}
 
@@ -126,6 +132,7 @@ func writeToFile(outFile, output string) error {
 func gatherObjects(parentTitle string, schema *jsonschema.Schema, flatObjects []string) {
 	name := schema.Title
 
+	// properties matching flatObjects will be dumped directly and shouldn't be added to the list of objects
 	if slices.Contains(flatObjects, name) {
 		return
 	}
@@ -134,6 +141,7 @@ func gatherObjects(parentTitle string, schema *jsonschema.Schema, flatObjects []
 		name = strings.Join([]string{parentTitle, schema.Title}, " > ")
 	}
 
+	// primitive types don't need to be nested
 	if schema.Types.String() != "[object]" {
 		return
 	} else {

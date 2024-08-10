@@ -54,6 +54,10 @@ func (m MarkdownRenderer) PropertyRow(parent string, schema jsonschema.Schema, m
 
 }
 
+func (MarkdownRenderer) TextParagraph(text string) string {
+	return strings.ReplaceAll(text, "\n", "  \n") + "\n\n"
+}
+
 func (MarkdownRenderer) dumpPropertiesToValue(properties map[string]*jsonschema.Schema) string {
 
 	jsonString := renderer.DumpPropertiesToJson(properties)
