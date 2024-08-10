@@ -95,5 +95,5 @@ func init() {
 
 	rootCmd.Flags().IntP("depth", "d", 0, "Depth of the schema to render")
 
-	rootCmd.Flags().StringSlice("flat", []string{}, "Properties to always dump to json, and not recurse into. For Helm schemas, recommended to use: 'securityContext,resources,affinity,tolerations,nodeSelector'")
+	rootCmd.Flags().StringSlice("flat", []string{}, "Properties to always dump to json, and not recurse into, can be repeated multiple times, or comma separated. For Helm schemas, recommended to use: 'securityContext,resources,affinity,tolerations,nodeSelector'")
 }
