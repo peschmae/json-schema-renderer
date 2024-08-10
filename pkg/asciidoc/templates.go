@@ -23,7 +23,7 @@ func (a AsciiDocRenderer) PropertyHeader(title string, level int) string {
 
 func (AsciiDocRenderer) TableHeader() string {
 
-	return `[cols="1,1,a,1"]
+	return `[cols="1,1,1a,1"]
 |===
 |Name |Type |Default |Description
 
@@ -37,7 +37,8 @@ func (AsciiDocRenderer) TableFooter() string {
 
 func (a AsciiDocRenderer) PropertyRow(parent string, schema jsonschema.Schema, maxDepth bool) string {
 
-	descr := html.EscapeString(schema.Description)
+	// escape the description and replace | with {vbar} to avoid table row split
+	descr := a.escapeText(schema.Description)
 
 	if schema.Types.String() != "[object]" {
 
@@ -52,8 +53,8 @@ func (a AsciiDocRenderer) PropertyRow(parent string, schema jsonschema.Schema, m
 	return fmt.Sprintf("|%s |%s |%s |%s\n", a.link(a.propertyId(parent, schema.Title), schema.Title), strings.Join(schema.Types.ToStrings(), ", "), "", descr)
 }
 
-func (AsciiDocRenderer) TextParagraph(text string) string {
-	return strings.ReplaceAll(text, "\n", " +\n") + "\n\n"
+func (a AsciiDocRenderer) TextParagraph(text string) string {
+	return a.escapeText(text) + "\n\n"
 }
 
 func (a AsciiDocRenderer) dumpPropertiesToValue(properties map[string]*jsonschema.Schema) string {
@@ -65,6 +66,16 @@ func (a AsciiDocRenderer) dumpPropertiesToValue(properties map[string]*jsonschem
 	output += "\n----\n"
 
 	return output
+}
+
+// escape text to make it asciidoc compatible, replacing newlines and | with {vbar}
+func (AsciiDocRenderer) escapeText(text string) string {
+	// escape newline
+	text = strings.ReplaceAll(text, "\n", " +\n")
+	// escape | and replace with {vbar} to avoid table row split
+	text = strings.ReplaceAll(text, "|", "{vbar}")
+
+	return html.EscapeString(text)
 }
 
 func (AsciiDocRenderer) link(id, title string) string {
