@@ -71,8 +71,9 @@ var rootCmd = &cobra.Command{
 		format := strings.Trim(cmd.Flag("format").Value.String(), " ")
 		title := strings.Trim(cmd.Flag("title").Value.String(), " ")
 		depth, _ := cmd.Flags().GetInt("depth")
+		flatObjects, _ := cmd.Flags().GetStringSlice("flat")
 
-		return renderDoc(inputFile, output, format, title, depth)
+		return renderDoc(inputFile, output, format, title, depth, flatObjects)
 	},
 }
 
@@ -93,4 +94,6 @@ func init() {
 	rootCmd.Flags().StringP("title", "t", "Root Schema", "Title of the document")
 
 	rootCmd.Flags().IntP("depth", "d", 0, "Depth of the schema to render")
+
+	rootCmd.Flags().StringSlice("flat", []string{}, "Properties to always dump to json, and not recurse into. For Helm schemas, recommended to use: 'securityContext,resources,affinity,tolerations,nodeSelector'")
 }
