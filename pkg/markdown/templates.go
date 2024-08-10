@@ -33,7 +33,7 @@ func (MarkdownRenderer) TableFooter() string {
 	return ""
 }
 
-func (MarkdownRenderer) PropertyRow(parent string, schema jsonschema.Schema) string {
+func (MarkdownRenderer) PropertyRow(parent string, schema jsonschema.Schema, maxDepth bool) string {
 
 	description := strings.ReplaceAll(schema.Description, "\n", "<br>")
 

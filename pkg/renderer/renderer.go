@@ -12,7 +12,7 @@ type Renderer interface {
 	PropertyHeader(string, int) string
 	TableHeader() string
 	TableFooter() string
-	PropertyRow(string, jsonschema.Schema) string
+	PropertyRow(string, jsonschema.Schema, bool) string
 }
 
 func GetValue(schema jsonschema.Schema) string {
@@ -52,4 +52,26 @@ func GetValue(schema jsonschema.Schema) string {
 	}
 
 	return ""
+}
+
+func DumpPropertiesToJson(properties map[string]*jsonschema.Schema) string {
+
+	props := dumpPropertiesToMap(properties)
+
+	b, _ := json.MarshalIndent(props, "", " ")
+	return string(b)
+}
+
+func dumpPropertiesToMap(properties map[string]*jsonschema.Schema) map[string]interface{} {
+
+	props := map[string]interface{}{}
+	for k, v := range properties {
+		if v.Types.String() == "[object]" {
+			props[k] = dumpPropertiesToMap(v.Properties)
+		} else {
+			props[k] = v.Default
+		}
+	}
+
+	return props
 }

@@ -48,7 +48,7 @@ func renderDoc(input, outFile, format, title string, depth int) error {
 	output += r.Header(title, 0)
 	output += r.TableHeader()
 	for _, sch := range schema.Properties {
-		output += r.PropertyRow("", *sch)
+		output += r.PropertyRow("", *sch, depth == 1)
 		gatherObjects("", sch)
 	}
 	output += r.TableFooter()
@@ -73,8 +73,9 @@ func renderDoc(input, outFile, format, title string, depth int) error {
 			sort.Strings(propertyKeys)
 
 			for _, s := range propertyKeys {
-				output += r.PropertyRow(key, *objects[key].Properties[s])
+				output += r.PropertyRow(key, *objects[key].Properties[s], strings.Count(key, ">") == depth)
 			}
+
 			output += r.TableFooter()
 			output += "\n"
 		}
