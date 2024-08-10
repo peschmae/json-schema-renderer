@@ -70,8 +70,9 @@ var rootCmd = &cobra.Command{
 		output := strings.Trim(cmd.Flag("output").Value.String(), " ")
 		format := strings.Trim(cmd.Flag("format").Value.String(), " ")
 		title := strings.Trim(cmd.Flag("title").Value.String(), " ")
+		depth, _ := cmd.Flags().GetInt("depth")
 
-		return renderDoc(inputFile, output, format, title)
+		return renderDoc(inputFile, output, format, title, depth)
 	},
 }
 
@@ -90,4 +91,6 @@ func init() {
 	rootCmd.Flags().StringP("format", "f", "asciidoc", "Output format (asciidoc, markdown)")
 
 	rootCmd.Flags().StringP("title", "t", "Root Schema", "Title of the document")
+
+	rootCmd.Flags().IntP("depth", "d", 0, "Depth of the schema to render")
 }

@@ -28,7 +28,7 @@ func validateInputFile(inputFile string) error {
 	return nil
 }
 
-func renderDoc(input, outFile, format, title string) error {
+func renderDoc(input, outFile, format, title string, depth int) error {
 	c := jsonschema.NewCompiler()
 	schema, err := c.Compile(input)
 	if err != nil {
@@ -63,19 +63,21 @@ func renderDoc(input, outFile, format, title string) error {
 	sort.Strings(objectsKeys)
 
 	for _, key := range objectsKeys {
-		output += r.PropertyHeader(key, strings.Count(key, ">")+1)
-		output += r.TableHeader()
-		propertyKeys := make([]string, 0, len(objects[key].Properties))
-		for k := range objects[key].Properties {
-			propertyKeys = append(propertyKeys, k)
-		}
-		sort.Strings(propertyKeys)
+		if depth == 0 || strings.Count(key, ">") <= depth {
+			output += r.PropertyHeader(key, strings.Count(key, ">")+1)
+			output += r.TableHeader()
+			propertyKeys := make([]string, 0, len(objects[key].Properties))
+			for k := range objects[key].Properties {
+				propertyKeys = append(propertyKeys, k)
+			}
+			sort.Strings(propertyKeys)
 
-		for _, s := range propertyKeys {
-			output += r.PropertyRow(key, *objects[key].Properties[s])
+			for _, s := range propertyKeys {
+				output += r.PropertyRow(key, *objects[key].Properties[s])
+			}
+			output += r.TableFooter()
+			output += "\n"
 		}
-		output += r.TableFooter()
-		output += "\n"
 	}
 
 	if outFile != "" {
