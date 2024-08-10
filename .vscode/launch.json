@@ -66,6 +66,20 @@
             ]
         },
         {
+            "name": "Write markdown to file  (depth limit = 2)",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": [
+                "-d=2",
+                "values.schema.json",
+                "-o rendered.md",
+                "-f markdown"
+            ]
+        },
+        {
             "name": "Write markdown to file",
             "type": "go",
             "request": "launch",

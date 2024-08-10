@@ -33,12 +33,12 @@ func (MarkdownRenderer) TableFooter() string {
 	return ""
 }
 
-func (MarkdownRenderer) PropertyRow(parent string, schema jsonschema.Schema, maxDepth bool) string {
+func (m MarkdownRenderer) PropertyRow(parent string, schema jsonschema.Schema, maxDepth bool) string {
 
 	description := strings.ReplaceAll(schema.Description, "\n", "<br>")
 
 	if schema.Types.String() != "[object]" {
-		return fmt.Sprintf("| %s | %s | %s | %s |\n", schema.Title, strings.Join(schema.Types.ToStrings(), ", "), renderer.GetValue(schema), description)
+		return fmt.Sprintf("| %s | %s | `%s` | %s |\n", schema.Title, strings.Join(schema.Types.ToStrings(), ", "), renderer.GetValue(schema), description)
 	}
 
 	id := strings.ToLower(schema.Title)
@@ -46,6 +46,24 @@ func (MarkdownRenderer) PropertyRow(parent string, schema jsonschema.Schema, max
 		id = strings.ToLower(strings.ReplaceAll(parent, " > ", "-")) + "-" + strings.ToLower(schema.Title)
 	}
 
+	if maxDepth {
+		return fmt.Sprintf("| %s | %s | %s | %s |\n", schema.Title, strings.Join(schema.Types.ToStrings(), ", "), m.dumpPropertiesToValue(schema.Properties), description)
+	}
+
 	return fmt.Sprintf("| [%s](#%s) | %s | %s | %s |\n", schema.Title, id, strings.Join(schema.Types.ToStrings(), ", "), "", description)
 
+}
+
+func (MarkdownRenderer) dumpPropertiesToValue(properties map[string]*jsonschema.Schema) string {
+
+	jsonString := renderer.DumpPropertiesToJson(properties)
+
+	formattedJson := strings.ReplaceAll(string(jsonString), " ", "&nbsp;")
+	formattedJson = strings.ReplaceAll(string(formattedJson), "\n", "<br>")
+
+	output := "<pre>"
+	output += formattedJson
+	output += "</pre>"
+
+	return output
 }
