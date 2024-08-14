@@ -19,6 +19,10 @@ type Renderer interface {
 func GetValue(schema jsonschema.Schema) string {
 	if schema.Types.String() != "[object]" {
 
+		if schema.Default == nil {
+			return ""
+		}
+
 		var value string
 		switch schema.Types.String() {
 		case "[string]":
