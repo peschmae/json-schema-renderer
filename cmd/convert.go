@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"slices"
-	"sort"
 	"strings"
 
 	"github.com/peschmae/json-schema-renderer/pkg/asciidoc"
@@ -49,9 +48,15 @@ func renderDoc(input, outFile, format, title string, depth int, flatObjects []st
 	// print schema
 	output += r.Header(title, 0)
 	output += r.TableHeader()
-	for key, sch := range schema.Properties {
-		output += r.PropertyRow("", key, *sch, depth == 1)
-		gatherObjects("", key, sch, flatObjects)
+	rootPropertyKeys := make([]string, 0, len(schema.Properties))
+	for k := range schema.Properties {
+		rootPropertyKeys = append(rootPropertyKeys, k)
+	}
+	slices.Sort(rootPropertyKeys)
+
+	for _, key := range rootPropertyKeys {
+		output += r.PropertyRow("", key, *schema.Properties[key], depth == 1)
+		gatherObjects("", key, schema.Properties[key], flatObjects)
 	}
 	output += r.TableFooter()
 	output += "\n"
@@ -62,7 +67,7 @@ func renderDoc(input, outFile, format, title string, depth int, flatObjects []st
 	for k := range objects {
 		objectsKeys = append(objectsKeys, k)
 	}
-	sort.Strings(objectsKeys)
+	slices.Sort(objectsKeys)
 
 	for _, key := range objectsKeys {
 
@@ -83,7 +88,7 @@ func renderDoc(input, outFile, format, title string, depth int, flatObjects []st
 			for k := range objects[key].Properties {
 				propertyKeys = append(propertyKeys, k)
 			}
-			sort.Strings(propertyKeys)
+			slices.Sort(propertyKeys)
 
 			for _, s := range propertyKeys {
 
