@@ -48,9 +48,9 @@ func renderDoc(input, outFile, format, title string, depth int, flatObjects []st
 	// print schema
 	output += r.Header(title, 0)
 	output += r.TableHeader()
-	for _, sch := range schema.Properties {
-		output += r.PropertyRow("", *sch, depth == 1)
-		gatherObjects("", sch, flatObjects)
+	for key, sch := range schema.Properties {
+		output += r.PropertyRow("", key, *sch, depth == 1)
+		gatherObjects("", key, sch, flatObjects)
 	}
 	output += r.TableFooter()
 	output += "\n"
@@ -68,7 +68,11 @@ func renderDoc(input, outFile, format, title string, depth int, flatObjects []st
 		if depth == 0 || strings.Count(key, ">") <= depth {
 			output += r.PropertyHeader(key, strings.Count(key, ">")+1)
 
-			if objects[key].Description != "" {
+			if objects[key].Title != "" && objects[key].Description != "" {
+				output += r.TextParagraph("**" + objects[key].Title + ":** " + objects[key].Description)
+			} else if objects[key].Title != "" {
+				output += r.TextParagraph(objects[key].Title)
+			} else if objects[key].Description != "" {
 				output += r.TextParagraph(objects[key].Description)
 			}
 
@@ -90,7 +94,7 @@ func renderDoc(input, outFile, format, title string, depth int, flatObjects []st
 					dumpValue = false
 				}
 
-				output += r.PropertyRow(key, *objects[key].Properties[s], dumpValue)
+				output += r.PropertyRow(key, s, *objects[key].Properties[s], dumpValue)
 			}
 
 			output += r.TableFooter()
@@ -129,8 +133,7 @@ func writeToFile(outFile, output string) error {
 	return nil
 }
 
-func gatherObjects(parentTitle string, schema *jsonschema.Schema, flatObjects []string) {
-	name := schema.Title
+func gatherObjects(parentTitle, name string, schema *jsonschema.Schema, flatObjects []string) {
 
 	// properties matching flatObjects will be dumped directly and shouldn't be added to the list of objects
 	if slices.Contains(flatObjects, name) {
@@ -138,7 +141,7 @@ func gatherObjects(parentTitle string, schema *jsonschema.Schema, flatObjects []
 	}
 
 	if parentTitle != "" {
-		name = strings.Join([]string{parentTitle, schema.Title}, " > ")
+		name = strings.Join([]string{parentTitle, name}, " > ")
 	}
 
 	// primitive types don't need to be nested
@@ -147,9 +150,9 @@ func gatherObjects(parentTitle string, schema *jsonschema.Schema, flatObjects []
 	} else {
 		objects[name] = *schema
 
-		for _, sch := range schema.Properties {
+		for key, sch := range schema.Properties {
 			if sch.Types.String() == "[object]" {
-				gatherObjects(name, sch, flatObjects)
+				gatherObjects(name, key, sch, flatObjects)
 			}
 		}
 	}

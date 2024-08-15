@@ -35,22 +35,22 @@ func (AsciiDocRenderer) TableFooter() string {
 	return "|===\n"
 }
 
-func (a AsciiDocRenderer) PropertyRow(parent string, schema jsonschema.Schema, maxDepth bool) string {
+func (a AsciiDocRenderer) PropertyRow(parent, name string, schema jsonschema.Schema, maxDepth bool) string {
 
 	// escape the description and replace | with {vbar} to avoid table row split
 	descr := a.escapeText(schema.Description)
 
 	if schema.Types.String() != "[object]" {
 
-		return fmt.Sprintf("|%s |%s |``%s`` |%s\n", schema.Title, strings.Join(schema.Types.ToStrings(), ", "), renderer.GetValue(schema), descr)
+		return fmt.Sprintf("|%s |%s |``%s`` |%s\n", name, strings.Join(schema.Types.ToStrings(), ", "), renderer.GetValue(schema), descr)
 	}
 
 	// on maxDepth we dump the nested object, but don't link to it
 	if maxDepth {
-		return fmt.Sprintf("|%s |%s |%s |%s\n", schema.Title, strings.Join(schema.Types.ToStrings(), ", "), a.dumpPropertiesToValue(schema.Properties), descr)
+		return fmt.Sprintf("|%s |%s |%s |%s\n", name, strings.Join(schema.Types.ToStrings(), ", "), a.dumpPropertiesToValue(schema.Properties), descr)
 	}
 
-	return fmt.Sprintf("|%s |%s |%s |%s\n", a.link(a.propertyId(parent, schema.Title), schema.Title), strings.Join(schema.Types.ToStrings(), ", "), "", descr)
+	return fmt.Sprintf("|%s |%s |%s |%s\n", a.link(a.propertyId(parent, name), name), strings.Join(schema.Types.ToStrings(), ", "), "", descr)
 }
 
 func (a AsciiDocRenderer) TextParagraph(text string) string {

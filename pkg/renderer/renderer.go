@@ -12,7 +12,7 @@ type Renderer interface {
 	PropertyHeader(string, int) string
 	TableHeader() string
 	TableFooter() string
-	PropertyRow(string, jsonschema.Schema, bool) string
+	PropertyRow(string, string, jsonschema.Schema, bool) string
 	TextParagraph(string) string
 }
 

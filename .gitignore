@@ -1,7 +1,7 @@
 *.adoc
 *.md
 !README.md
-values.schema.json
+*.schema.json
 
 json-schema-renderer
 
