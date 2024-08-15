@@ -29,7 +29,7 @@ func validateInputFile(inputFile string) error {
 	return nil
 }
 
-func renderDoc(input, outFile, format, title string, depth int, flatObjects []string) error {
+func renderDoc(input, outFile, format, title string, depth int, flatObjects []string, flatOutput string) error {
 	c := jsonschema.NewCompiler()
 	schema, err := c.Compile(input)
 	if err != nil {
@@ -38,10 +38,11 @@ func renderDoc(input, outFile, format, title string, depth int, flatObjects []st
 
 	var r renderer.Renderer
 	if format == "markdown" {
-		r = markdown.MarkdownRenderer{}
+		r = &markdown.MarkdownRenderer{}
 	} else {
-		r = asciidoc.AsciiDocRenderer{}
+		r = &asciidoc.AsciiDocRenderer{}
 	}
+	r.SetFlatOutput(flatOutput)
 
 	output := ""
 

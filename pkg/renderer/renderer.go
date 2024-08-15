@@ -5,9 +5,11 @@ import (
 	"strconv"
 
 	"github.com/santhosh-tekuri/jsonschema/v6"
+	"gopkg.in/yaml.v3"
 )
 
 type Renderer interface {
+	SetFlatOutput(string)
 	Header(string, int) string
 	PropertyHeader(string, int) string
 	TableHeader() string
@@ -64,6 +66,14 @@ func DumpPropertiesToJson(properties map[string]*jsonschema.Schema) string {
 	props := dumpPropertiesToMap(properties)
 
 	b, _ := json.MarshalIndent(props, "", " ")
+	return string(b)
+}
+
+func DumpPropertiesToYaml(properties map[string]*jsonschema.Schema) string {
+
+	props := dumpPropertiesToMap(properties)
+
+	b, _ := yaml.Marshal(props)
 	return string(b)
 }
 

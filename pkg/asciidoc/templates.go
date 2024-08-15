@@ -10,7 +10,13 @@ import (
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
-type AsciiDocRenderer struct{}
+type AsciiDocRenderer struct {
+	flatOutput string
+}
+
+func (a *AsciiDocRenderer) SetFlatOutput(output string) {
+	a.flatOutput = output
+}
 
 func (AsciiDocRenderer) Header(title string, level int) string {
 	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("=", int(math.Min(6, float64(level+1)))), title)
@@ -59,10 +65,15 @@ func (a AsciiDocRenderer) TextParagraph(text string) string {
 
 func (a AsciiDocRenderer) dumpPropertiesToValue(properties map[string]*jsonschema.Schema) string {
 
-	jsonString := renderer.DumpPropertiesToJson(properties)
+	var props string
+	if a.flatOutput == "yaml" {
+		props = renderer.DumpPropertiesToYaml(properties)
+	} else {
+		props = renderer.DumpPropertiesToJson(properties)
+	}
 
-	output := "[source,json]\n----\n"
-	output += string(jsonString)
+	output := "[source," + a.flatOutput + "]\n----\n"
+	output += string(props)
 	output += "\n----\n"
 
 	return output
