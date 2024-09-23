@@ -10,12 +10,12 @@ import (
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
-type AsciiDocRenderer struct {
-	flatOutput string
+func NewRenderer(flatOutput string) renderer.Renderer {
+	return &AsciiDocRenderer{flatOutput: flatOutput}
 }
 
-func (a *AsciiDocRenderer) SetFlatOutput(output string) {
-	a.flatOutput = output
+type AsciiDocRenderer struct {
+	flatOutput string
 }
 
 func (AsciiDocRenderer) Header(title string, level int) string {

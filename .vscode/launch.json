@@ -12,7 +12,8 @@
             "program": "${workspaceFolder}",
             "console": "integratedTerminal",
             "args": [
-                "cluster.schema.json"
+                "cluster.schema.json",
+                "--required"
             ]
         },
         {

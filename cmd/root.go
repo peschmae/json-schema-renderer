@@ -12,6 +12,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var flatOutput string
+var requiredOnly bool
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "json-schema-renderer",
@@ -72,9 +75,11 @@ var rootCmd = &cobra.Command{
 		title := strings.Trim(cmd.Flag("title").Value.String(), " ")
 		depth, _ := cmd.Flags().GetInt("depth")
 		flatObjects, _ := cmd.Flags().GetStringSlice("flat")
-		flatOutput := strings.Trim(cmd.Flag("flat-type").Value.String(), " ")
+		flatOutput = strings.Trim(cmd.Flag("flat-type").Value.String(), " ")
 
-		return renderDoc(inputFile, output, format, title, depth, flatObjects, flatOutput)
+		requiredOnly = cmd.Flag("required").Value.String() == "true"
+
+		return renderDoc(inputFile, output, format, title, depth, flatObjects)
 	},
 }
 
@@ -99,4 +104,6 @@ func init() {
 	rootCmd.Flags().StringSlice("flat", []string{}, "Properties to always dump to json, and not recurse into, can be repeated multiple times, or comma separated. For Helm schemas, recommended to use: 'securityContext,resources,affinity,tolerations,nodeSelector'")
 
 	rootCmd.Flags().String("flat-type", "json", "How to dump the flat objects, either json or yaml")
+
+	rootCmd.Flags().Bool("required", false, "Only show required properties in the schema")
 }
