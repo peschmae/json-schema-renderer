@@ -9,12 +9,12 @@ import (
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
-type MarkdownRenderer struct {
-	flatOutput string
+func NewRenderer(flatOutput string) renderer.Renderer {
+	return &MarkdownRenderer{flatOutput: flatOutput}
 }
 
-func (m *MarkdownRenderer) SetFlatOutput(output string) {
-	m.flatOutput = output
+type MarkdownRenderer struct {
+	flatOutput string
 }
 
 func (MarkdownRenderer) Header(title string, level int) string {

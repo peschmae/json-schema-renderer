@@ -9,7 +9,6 @@ import (
 )
 
 type Renderer interface {
-	SetFlatOutput(string)
 	Header(string, int) string
 	PropertyHeader(string, int) string
 	TableHeader() string
