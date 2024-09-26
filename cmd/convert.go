@@ -4,8 +4,6 @@ Copyright © 2024 Mathias Petermann <mathias.petermann@gmail.com>
 package cmd
 
 import (
-	"fmt"
-	"os"
 	"slices"
 	"strings"
 
@@ -29,11 +27,11 @@ func validateInputFile(inputFile string) error {
 	return nil
 }
 
-func renderDoc(input, outFile, format, title string, depth int, flatObjects []string) error {
+func renderDoc(input, format, title string, depth int, flatObjects []string) (string, error) {
 	c := jsonschema.NewCompiler()
 	schema, err := c.Compile(input)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var r renderer.Renderer
@@ -115,35 +113,7 @@ func renderDoc(input, outFile, format, title string, depth int, flatObjects []st
 		}
 	}
 
-	if outFile != "" {
-		// write to file
-		err := writeToFile(outFile, output)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("Output written to %s\n", outFile)
-
-	} else {
-		fmt.Print(output)
-	}
-
-	return nil
-}
-
-func writeToFile(outFile, output string) error {
-	outFile = strings.Trim(outFile, " ")
-	f, err := os.Create(outFile)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	_, err = f.WriteString(output)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return output, nil
 }
 
 func gatherObjects(parentTitle, name string, schema *jsonschema.Schema, flatObjects []string) bool {

@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -70,17 +71,47 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		output := strings.Trim(cmd.Flag("output").Value.String(), " ")
+		outputFile := strings.Trim(cmd.Flag("output").Value.String(), " ")
 		format := strings.Trim(cmd.Flag("format").Value.String(), " ")
 		title := strings.Trim(cmd.Flag("title").Value.String(), " ")
 		depth, _ := cmd.Flags().GetInt("depth")
 		flatObjects, _ := cmd.Flags().GetStringSlice("flat")
-		flatOutput = strings.Trim(cmd.Flag("flat-type").Value.String(), " ")
 
-		requiredOnly = cmd.Flag("required").Value.String() == "true"
+		rendered, err := renderDoc(inputFile, format, title, depth, flatObjects)
+		if err != nil {
+			return err
+		}
 
-		return renderDoc(inputFile, output, format, title, depth, flatObjects)
+		if outputFile != "" {
+			// write to file
+			err := writeToFile(outputFile, rendered)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("Output written to %s\n", outputFile)
+
+		} else {
+			fmt.Print(rendered)
+		}
+
+		return nil
 	},
+}
+
+func writeToFile(outFile, output string) error {
+	outFile = strings.Trim(outFile, " ")
+	f, err := os.Create(outFile)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	_, err = f.WriteString(output)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -103,7 +134,7 @@ func init() {
 
 	rootCmd.Flags().StringSlice("flat", []string{}, "Properties to always dump to json, and not recurse into, can be repeated multiple times, or comma separated. For Helm schemas, recommended to use: 'securityContext,resources,affinity,tolerations,nodeSelector'")
 
-	rootCmd.Flags().String("flat-type", "json", "How to dump the flat objects, either json or yaml")
+	rootCmd.Flags().StringVar(&flatOutput, "flat-type", "json", "How to dump the flat objects, either json or yaml")
 
-	rootCmd.Flags().Bool("required", false, "Only show required properties in the schema")
+	rootCmd.Flags().BoolVar(&requiredOnly, "required", false, "Only show required properties in the schema")
 }
