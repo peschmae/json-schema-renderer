@@ -76,6 +76,13 @@
       {}
      ]
     },
+    "bool": {
+        "title": "boolean",
+        "type": [
+            "boolean"
+        ],
+        "default": true
+    },
     "one_of_strings": {
      "title": "one_of_strings",
      "type": [

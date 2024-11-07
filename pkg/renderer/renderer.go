@@ -17,6 +17,7 @@ type Renderer interface {
 	HeaderLevel(int) int
 }
 
+// in JSON all values are basically strings, so they are converted before returned
 func GetValue(schema jsonschema.Schema) string {
 	if schema.Types.String() != "[object]" {
 
