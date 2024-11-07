@@ -30,13 +30,14 @@ func (m *JsonSchemaAsciidoc) ContainerEcho(stringArg string) *dagger.Container {
 	return dag.Container().From("alpine:latest").WithExec([]string{"echo", stringArg})
 }
 
+// Publishes the container to ttl.sh
 func (m *JsonSchemaAsciidoc) Publish(ctx context.Context, source *dagger.Directory, binaryName string) (string, error) {
 	_, err := m.Test(ctx, source)
 	if err != nil {
 		return "", err
 	}
-	return m.Build(source, binaryName).
-		Publish(ctx, fmt.Sprintf("ttl.sh/json-schema-renderer-%.0f", math.Floor(rand.Float64()*10000000))) //#nosec
+	return m.BuildContainer(source, binaryName).
+		Publish(ctx, fmt.Sprintf("ttl.sh/json-schema-renderer-%.0f:1h", math.Floor(rand.Float64()*10000000))) //#nosec
 }
 
 // Return the result of running unit tests
@@ -57,9 +58,21 @@ func (m *JsonSchemaAsciidoc) BuildEnv(source *dagger.Directory) *dagger.Containe
 		WithExec([]string{"go", "mod", "download"})
 }
 
-func (m *JsonSchemaAsciidoc) Build(source *dagger.Directory, binaryName string) *dagger.Container {
+// Builds a container with the binary set as the entrypoint
+func (m *JsonSchemaAsciidoc) BuildContainer(source *dagger.Directory, binaryName string) *dagger.Container {
 
-	build := m.BuildEnv(source).
+	build := m.BuildBinary(source, binaryName)
+
+	return dag.Container().
+		From("alpine:latest").
+		WithFile("/usr/bin/"+binaryName, build).
+		WithEntrypoint([]string{binaryName})
+}
+
+// Builds the binary
+func (m *JsonSchemaAsciidoc) BuildBinary(source *dagger.Directory, binaryName string) *dagger.File {
+
+	return m.BuildEnv(source).
 		WithEnvVariable("GOMODCACHE", "/go/pkg/mod").
 		WithMountedCache("/go/build-cache", dag.CacheVolume("gomod")).
 		WithEnvVariable("GOCACHE", "/go/build-cache").
@@ -67,9 +80,4 @@ func (m *JsonSchemaAsciidoc) Build(source *dagger.Directory, binaryName string) 
 		WithDirectory("/src", source).
 		WithExec([]string{"go", "build", "-ldflags", "-s -w", "-o", binaryName, "."}).
 		File("/src/" + binaryName)
-
-	return dag.Container().
-		From("alpine:latest").
-		WithFile("/usr/bin/"+binaryName, build).
-		WithEntrypoint([]string{binaryName})
 }
