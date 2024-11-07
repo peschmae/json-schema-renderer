@@ -7,8 +7,6 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/peschmae/json-schema-renderer/pkg/asciidoc"
-	"github.com/peschmae/json-schema-renderer/pkg/markdown"
 	"github.com/peschmae/json-schema-renderer/pkg/renderer"
 	util "github.com/peschmae/json-schema-renderer/pkg/schema"
 	"github.com/santhosh-tekuri/jsonschema/v6"
@@ -36,9 +34,9 @@ func renderDoc(input, format, title string, depth int, flatObjects []string, hea
 
 	var r renderer.Renderer
 	if format == "markdown" {
-		r = markdown.NewRenderer(flatOutput, headerOffset)
+		r = renderer.NewMarkdownRenderer(flatOutput, headerOffset)
 	} else {
-		r = asciidoc.NewRenderer(flatOutput, headerOffset)
+		r = renderer.NewAsciidocRenderer(flatOutput, headerOffset)
 	}
 
 	output := ""

@@ -1,16 +1,15 @@
-package markdown
+package renderer
 
 import (
 	"fmt"
 	"math"
 	"strings"
 
-	"github.com/peschmae/json-schema-renderer/pkg/renderer"
 	util "github.com/peschmae/json-schema-renderer/pkg/schema"
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
-func NewRenderer(flatOutput string, headerOffset int) renderer.Renderer {
+func NewMarkdownRenderer(flatOutput string, headerOffset int) Renderer {
 	return &MarkdownRenderer{flatOutput: flatOutput, headerOffset: headerOffset}
 }
 
@@ -50,7 +49,7 @@ func (m *MarkdownRenderer) PropertyRow(parent, name string, schema jsonschema.Sc
 	description := strings.ReplaceAll(schema.Description, "\n", "<br>")
 
 	if schema.Types.String() != "[object]" {
-		return fmt.Sprintf("| %s | %s | `%s` | %s |\n", name, strings.Join(schema.Types.ToStrings(), ", "), renderer.GetValue(schema), description)
+		return fmt.Sprintf("| %s | %s | `%s` | %s |\n", name, strings.Join(schema.Types.ToStrings(), ", "), GetValue(schema), description)
 	}
 
 	id := strings.ToLower(name)

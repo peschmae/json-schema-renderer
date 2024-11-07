@@ -1,4 +1,4 @@
-package asciidoc
+package renderer
 
 import (
 	"fmt"
@@ -6,12 +6,11 @@ import (
 	"math"
 	"strings"
 
-	"github.com/peschmae/json-schema-renderer/pkg/renderer"
 	util "github.com/peschmae/json-schema-renderer/pkg/schema"
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
-func NewRenderer(flatOutput string, headerOffset int) renderer.Renderer {
+func NewAsciidocRenderer(flatOutput string, headerOffset int) Renderer {
 	return &AsciiDocRenderer{flatOutput: flatOutput, headerOffset: headerOffset}
 }
 
@@ -54,7 +53,7 @@ func (a *AsciiDocRenderer) PropertyRow(parent, name string, schema jsonschema.Sc
 
 	if schema.Types.String() != "[object]" {
 
-		return fmt.Sprintf("|%s |%s |``%s`` |%s\n", name, strings.Join(schema.Types.ToStrings(), ", "), renderer.GetValue(schema), descr)
+		return fmt.Sprintf("|%s |%s |``%s`` |%s\n", name, strings.Join(schema.Types.ToStrings(), ", "), GetValue(schema), descr)
 	}
 
 	// on maxDepth we dump the nested object, but don't link to it
