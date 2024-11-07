@@ -3,33 +3,27 @@ package renderer
 import (
 	"fmt"
 	"html"
-	"math"
 	"strings"
 
 	util "github.com/peschmae/json-schema-renderer/pkg/schema"
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
-func NewAsciidocRenderer(flatOutput string, headerOffset int) Renderer {
-	return &AsciiDocRenderer{flatOutput: flatOutput, headerOffset: headerOffset}
+func NewAsciidocRenderer(flatOutput string) Renderer {
+	return &AsciiDocRenderer{flatOutput: flatOutput}
 }
 
 type AsciiDocRenderer struct {
-	flatOutput   string
-	headerOffset int
-}
-
-func (a *AsciiDocRenderer) HeaderLevel(level int) int {
-	return int(math.Min(6, float64(level+a.headerOffset)))
+	flatOutput string
 }
 
 func (a *AsciiDocRenderer) Header(title string, level int) string {
-	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("=", a.HeaderLevel(level)), title)
+	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("=", headerLevel(level)), title)
 }
 
 func (a *AsciiDocRenderer) PropertyHeader(title string, level int) string {
 
-	return fmt.Sprintf("\n[#%s]\n%s Property: %s\n\n", a.propertyId("", title), strings.Repeat("=", a.HeaderLevel(level)), title)
+	return fmt.Sprintf("\n[#%s]\n%s Property: %s\n\n", a.propertyId("", title), strings.Repeat("=", headerLevel(level)), title)
 }
 
 func (AsciiDocRenderer) TableHeader() string {
@@ -53,7 +47,7 @@ func (a *AsciiDocRenderer) PropertyRow(parent, name string, schema jsonschema.Sc
 
 	if schema.Types.String() != "[object]" {
 
-		return fmt.Sprintf("|%s |%s |``%s`` |%s\n", name, strings.Join(schema.Types.ToStrings(), ", "), GetValue(schema), descr)
+		return fmt.Sprintf("|%s |%s |``%s`` |%s\n", name, strings.Join(schema.Types.ToStrings(), ", "), getValue(schema), descr)
 	}
 
 	// on maxDepth we dump the nested object, but don't link to it

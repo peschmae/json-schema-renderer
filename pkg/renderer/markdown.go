@@ -2,34 +2,28 @@ package renderer
 
 import (
 	"fmt"
-	"math"
 	"strings"
 
 	util "github.com/peschmae/json-schema-renderer/pkg/schema"
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
-func NewMarkdownRenderer(flatOutput string, headerOffset int) Renderer {
-	return &MarkdownRenderer{flatOutput: flatOutput, headerOffset: headerOffset}
+func NewMarkdownRenderer(flatOutput string) Renderer {
+	return &MarkdownRenderer{flatOutput: flatOutput}
 }
 
 type MarkdownRenderer struct {
-	flatOutput   string
-	headerOffset int
-}
-
-func (m *MarkdownRenderer) HeaderLevel(level int) int {
-	return int(math.Min(6, float64(level+m.headerOffset)))
+	flatOutput string
 }
 
 func (m *MarkdownRenderer) Header(title string, level int) string {
-	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("#", m.HeaderLevel(level)), title)
+	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("#", headerLevel(level)), title)
 }
 
 func (m *MarkdownRenderer) PropertyHeader(title string, level int) string {
 	id := strings.ToLower(strings.ReplaceAll(title, " > ", "-"))
 
-	return fmt.Sprintf("\n%s <a name=\"%s\"></a> Property: %s\n\n", strings.Repeat("#", m.HeaderLevel(level)), id, title)
+	return fmt.Sprintf("\n%s <a name=\"%s\"></a> Property: %s\n\n", strings.Repeat("#", headerLevel(level)), id, title)
 }
 
 func (MarkdownRenderer) TableHeader() string {
@@ -49,7 +43,7 @@ func (m *MarkdownRenderer) PropertyRow(parent, name string, schema jsonschema.Sc
 	description := strings.ReplaceAll(schema.Description, "\n", "<br>")
 
 	if schema.Types.String() != "[object]" {
-		return fmt.Sprintf("| %s | %s | `%s` | %s |\n", name, strings.Join(schema.Types.ToStrings(), ", "), GetValue(schema), description)
+		return fmt.Sprintf("| %s | %s | `%s` | %s |\n", name, strings.Join(schema.Types.ToStrings(), ", "), getValue(schema), description)
 	}
 
 	id := strings.ToLower(name)

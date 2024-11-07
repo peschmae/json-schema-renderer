@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/peschmae/json-schema-renderer/pkg/renderer"
 	"github.com/spf13/cobra"
 )
 
@@ -76,9 +77,10 @@ var rootCmd = &cobra.Command{
 		title := strings.Trim(cmd.Flag("title").Value.String(), " ")
 		depth, _ := cmd.Flags().GetInt("depth")
 		flatObjects, _ := cmd.Flags().GetStringSlice("flat")
-		headerOffset, _ := cmd.Flags().GetInt("header-level-offset")
 
-		rendered, err := renderDoc(inputFile, format, title, depth, flatObjects, headerOffset)
+		renderer.HeaderOffset, _ = cmd.Flags().GetInt("header-level-offset")
+
+		rendered, err := renderDoc(inputFile, format, title, depth, flatObjects)
 		if err != nil {
 			return err
 		}

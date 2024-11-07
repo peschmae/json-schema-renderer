@@ -7,18 +7,31 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestIsRequiredMinItems(t *testing.T) {
+func TestIsRequired(t *testing.T) {
 	c := jsonschema.NewCompiler()
 	schema, err := c.Compile("../../testdata/test.schema.json")
 
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Run("minItems", func(t *testing.T) {
+		assert.True(t, isRequired(schema.Properties["foo"].Properties["array_key"]))
+	})
 
-	assert.True(t, isRequired(schema.Properties["foo"].Properties["array_key"]))
+	t.Run("minProperties", func(t *testing.T) {
+		assert.True(t, isRequired(schema.Properties["foo"].Properties["map_key"]))
+	})
+
+	t.Run("minLength", func(t *testing.T) {
+		assert.True(t, isRequired(schema.Properties["foo"].Properties["string_key"]))
+	})
+
+	t.Run("negative test", func(t *testing.T) {
+		assert.False(t, isRequired(schema.Properties["foo"].Properties["max_key"]))
+	})
 }
 
-func TestIsRequiredMinProperties(t *testing.T) {
+func TestGatherObjects(t *testing.T) {
 	c := jsonschema.NewCompiler()
 	schema, err := c.Compile("../../testdata/test.schema.json")
 
@@ -26,67 +39,27 @@ func TestIsRequiredMinProperties(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.True(t, isRequired(schema.Properties["foo"].Properties["map_key"]))
-}
+	obj, req := GatherObjects(schema, []string{})
 
-func TestIsRequiredMinLength(t *testing.T) {
-	c := jsonschema.NewCompiler()
-	schema, err := c.Compile("../../testdata/test.schema.json")
+	t.Run("requiredObjectNames", func(t *testing.T) {
+		assert.NotEmpty(t, req)
 
-	if err != nil {
-		t.Fatal(err)
-	}
+		expectedRequired := map[string]bool{
+			"foo":              true,
+			"foo > array_key":  true,
+			"foo > map_key":    true,
+			"foo > string_key": true,
+			"map_key":          true,
+		}
 
-	assert.True(t, isRequired(schema.Properties["foo"].Properties["string_key"]))
-}
+		assert.Equal(t, expectedRequired, req)
+	})
 
-func TestIsRequiredFalse(t *testing.T) {
-	c := jsonschema.NewCompiler()
-	schema, err := c.Compile("../../testdata/test.schema.json")
+	t.Run("objectsWrapper", func(t *testing.T) {
+		assert.NotEmpty(t, obj)
 
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.False(t, isRequired(schema.Properties["foo"].Properties["max_key"]))
-}
-
-func TestGatherObjectsRequiredObjectNames(t *testing.T) {
-	c := jsonschema.NewCompiler()
-	schema, err := c.Compile("../../testdata/test.schema.json")
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, req := GatherObjects(schema, []string{})
-
-	assert.NotEmpty(t, req)
-
-	expectedRequired := map[string]bool{
-		"foo":              true,
-		"foo > array_key":  true,
-		"foo > map_key":    true,
-		"foo > string_key": true,
-		"map_key":          true,
-	}
-
-	assert.Equal(t, expectedRequired, req)
-}
-
-func TestGatherObjectsObjectsWrapper(t *testing.T) {
-	c := jsonschema.NewCompiler()
-	schema, err := c.Compile("../../testdata/test.schema.json")
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	o, _ := GatherObjects(schema, []string{})
-
-	assert.NotEmpty(t, o)
-
-	// not worth building up the whole object structure
-	assert.Equal(t, 2, len(o))
-	assert.Equal(t, 11, len(o["foo"].Properties))
+		// not worth building up the whole object structure
+		assert.Equal(t, 2, len(obj))
+		assert.Equal(t, 11, len(obj["foo"].Properties))
+	})
 }

@@ -2,10 +2,13 @@ package renderer
 
 import (
 	"encoding/json"
+	"math"
 	"strconv"
 
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
+
+var HeaderOffset int
 
 type Renderer interface {
 	Header(string, int) string
@@ -14,11 +17,10 @@ type Renderer interface {
 	TableFooter() string
 	PropertyRow(string, string, jsonschema.Schema, bool) string
 	TextParagraph(string) string
-	HeaderLevel(int) int
 }
 
 // in JSON all values are basically strings, so they are converted before returned
-func GetValue(schema jsonschema.Schema) string {
+func getValue(schema jsonschema.Schema) string {
 	if schema.Types.String() != "[object]" {
 
 		if schema.Default == nil {
@@ -59,4 +61,8 @@ func GetValue(schema jsonschema.Schema) string {
 	}
 
 	return ""
+}
+
+func headerLevel(level int) int {
+	return int(math.Min(6, float64(level+HeaderOffset)))
 }
