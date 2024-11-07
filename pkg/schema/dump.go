@@ -23,9 +23,9 @@ func DumpPropertiesToYaml(properties map[string]*jsonschema.Schema) string {
 	return string(b)
 }
 
-func dumpPropertiesToMap(properties map[string]*jsonschema.Schema) map[string]interface{} {
+func dumpPropertiesToMap(properties map[string]*jsonschema.Schema) map[string]any {
 
-	props := map[string]interface{}{}
+	props := make(map[string]any)
 	for k, v := range properties {
 		if v.Types.String() == "[object]" {
 			props[k] = dumpPropertiesToMap(v.Properties)
