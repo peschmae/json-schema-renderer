@@ -15,6 +15,7 @@ type Renderer interface {
 	TableFooter() string
 	PropertyRow(string, string, jsonschema.Schema, bool) string
 	TextParagraph(string) string
+	HeaderLevel(int) int
 }
 
 func GetValue(schema jsonschema.Schema) string {

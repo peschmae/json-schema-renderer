@@ -10,21 +10,26 @@ import (
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
-func NewRenderer(flatOutput string) renderer.Renderer {
-	return &AsciiDocRenderer{flatOutput: flatOutput}
+func NewRenderer(flatOutput string, headerOffset int) renderer.Renderer {
+	return &AsciiDocRenderer{flatOutput: flatOutput, headerOffset: headerOffset}
 }
 
 type AsciiDocRenderer struct {
-	flatOutput string
+	flatOutput   string
+	headerOffset int
 }
 
-func (AsciiDocRenderer) Header(title string, level int) string {
-	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("=", int(math.Min(6, float64(level+1)))), title)
+func (a *AsciiDocRenderer) HeaderLevel(level int) int {
+	return int(math.Min(6, float64(level+a.headerOffset)))
 }
 
-func (a AsciiDocRenderer) PropertyHeader(title string, level int) string {
+func (a *AsciiDocRenderer) Header(title string, level int) string {
+	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("=", a.HeaderLevel(level)), title)
+}
 
-	return fmt.Sprintf("\n[#%s]\n%s Property: %s\n\n", a.propertyId("", title), strings.Repeat("=", int(math.Min(6, float64(level+1)))), title)
+func (a *AsciiDocRenderer) PropertyHeader(title string, level int) string {
+
+	return fmt.Sprintf("\n[#%s]\n%s Property: %s\n\n", a.propertyId("", title), strings.Repeat("=", a.HeaderLevel(level)), title)
 }
 
 func (AsciiDocRenderer) TableHeader() string {
@@ -41,7 +46,7 @@ func (AsciiDocRenderer) TableFooter() string {
 	return "|===\n"
 }
 
-func (a AsciiDocRenderer) PropertyRow(parent, name string, schema jsonschema.Schema, maxDepth bool) string {
+func (a *AsciiDocRenderer) PropertyRow(parent, name string, schema jsonschema.Schema, maxDepth bool) string {
 
 	// escape the description and replace | with {vbar} to avoid table row split
 	descr := a.escapeText(schema.Description)
@@ -59,11 +64,11 @@ func (a AsciiDocRenderer) PropertyRow(parent, name string, schema jsonschema.Sch
 	return fmt.Sprintf("|%s |%s |%s |%s\n", a.link(a.propertyId(parent, name), name), strings.Join(schema.Types.ToStrings(), ", "), "", descr)
 }
 
-func (a AsciiDocRenderer) TextParagraph(text string) string {
+func (a *AsciiDocRenderer) TextParagraph(text string) string {
 	return a.escapeText(text) + "\n\n"
 }
 
-func (a AsciiDocRenderer) dumpPropertiesToValue(properties map[string]*jsonschema.Schema) string {
+func (a *AsciiDocRenderer) dumpPropertiesToValue(properties map[string]*jsonschema.Schema) string {
 
 	var props string
 	if a.flatOutput == "yaml" {

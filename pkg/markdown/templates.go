@@ -9,22 +9,27 @@ import (
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
-func NewRenderer(flatOutput string) renderer.Renderer {
-	return &MarkdownRenderer{flatOutput: flatOutput}
+func NewRenderer(flatOutput string, headerOffset int) renderer.Renderer {
+	return &MarkdownRenderer{flatOutput: flatOutput, headerOffset: headerOffset}
 }
 
 type MarkdownRenderer struct {
-	flatOutput string
+	flatOutput   string
+	headerOffset int
 }
 
-func (MarkdownRenderer) Header(title string, level int) string {
-	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("#", int(math.Min(6, float64(level+1)))), title)
+func (m *MarkdownRenderer) HeaderLevel(level int) int {
+	return int(math.Min(6, float64(level+m.headerOffset)))
 }
 
-func (MarkdownRenderer) PropertyHeader(title string, level int) string {
+func (m *MarkdownRenderer) Header(title string, level int) string {
+	return fmt.Sprintf("\n%s %s\n\n", strings.Repeat("#", m.HeaderLevel(level)), title)
+}
+
+func (m *MarkdownRenderer) PropertyHeader(title string, level int) string {
 	id := strings.ToLower(strings.ReplaceAll(title, " > ", "-"))
 
-	return fmt.Sprintf("\n%s <a name=\"%s\"></a> Property: %s\n\n", strings.Repeat("#", int(math.Min(6, float64(level+1)))), id, title)
+	return fmt.Sprintf("\n%s <a name=\"%s\"></a> Property: %s\n\n", strings.Repeat("#", m.HeaderLevel(level)), id, title)
 }
 
 func (MarkdownRenderer) TableHeader() string {
@@ -39,7 +44,7 @@ func (MarkdownRenderer) TableFooter() string {
 	return ""
 }
 
-func (m MarkdownRenderer) PropertyRow(parent, name string, schema jsonschema.Schema, maxDepth bool) string {
+func (m *MarkdownRenderer) PropertyRow(parent, name string, schema jsonschema.Schema, maxDepth bool) string {
 
 	description := strings.ReplaceAll(schema.Description, "\n", "<br>")
 
@@ -64,7 +69,7 @@ func (MarkdownRenderer) TextParagraph(text string) string {
 	return strings.ReplaceAll(text, "\n", "  \n") + "\n\n"
 }
 
-func (m MarkdownRenderer) dumpPropertiesToValue(properties map[string]*jsonschema.Schema) string {
+func (m *MarkdownRenderer) dumpPropertiesToValue(properties map[string]*jsonschema.Schema) string {
 
 	var props string
 	if m.flatOutput == "yaml" {

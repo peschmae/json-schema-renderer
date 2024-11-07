@@ -76,8 +76,9 @@ var rootCmd = &cobra.Command{
 		title := strings.Trim(cmd.Flag("title").Value.String(), " ")
 		depth, _ := cmd.Flags().GetInt("depth")
 		flatObjects, _ := cmd.Flags().GetStringSlice("flat")
+		headerOffset, _ := cmd.Flags().GetInt("header-level-offset")
 
-		rendered, err := renderDoc(inputFile, format, title, depth, flatObjects)
+		rendered, err := renderDoc(inputFile, format, title, depth, flatObjects, headerOffset)
 		if err != nil {
 			return err
 		}
@@ -129,6 +130,7 @@ func init() {
 	rootCmd.Flags().StringP("format", "f", "asciidoc", "Output format (asciidoc, markdown)")
 
 	rootCmd.Flags().StringP("title", "t", "Root Schema", "Title of the document")
+	rootCmd.Flags().Int("header-level-offset", 1, "Header level for the title. All subsequent headers will be offset accordingly")
 
 	rootCmd.Flags().IntP("depth", "d", 0, "Depth of the schema to render")
 
