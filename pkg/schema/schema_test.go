@@ -88,5 +88,5 @@ func TestGatherObjectsObjectsWrapper(t *testing.T) {
 
 	// not worth building up the whole object structure
 	assert.Equal(t, 2, len(o))
-	assert.Equal(t, 10, len(o["foo"].Properties))
+	assert.Equal(t, 11, len(o["foo"].Properties))
 }

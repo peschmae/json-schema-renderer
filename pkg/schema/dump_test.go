@@ -21,6 +21,7 @@ func TestDumpPropertiesToJson(t *testing.T) {
 	expected := `{
  "foo": {
   "array_key": [],
+  "bool": true,
   "map_key": {},
   "max_key": 10,
   "min_key": 10,
@@ -48,6 +49,7 @@ func TestDumpPropertiesToYaml(t *testing.T) {
 
 	expected := `foo:
     array_key: []
+    bool: true
     map_key: {}
     max_key: "10"
     min_key: "10"
@@ -80,7 +82,7 @@ func TestDumpPropertiesToMap(t *testing.T) {
 	a, err := json.Marshal(properties)
 	assert.Empty(t, err)
 
-	expected := `{"foo":{"array_key":[],"map_key":{},"max_key":10,"min_key":10,"one_of_integers":1,"one_of_mixed":"one","one_of_strings":"one","range_float_key":2.2,"range_key":10,"string_key":""}}`
+	expected := `{"foo":{"array_key":[],"bool":true,"map_key":{},"max_key":10,"min_key":10,"one_of_integers":1,"one_of_mixed":"one","one_of_strings":"one","range_float_key":2.2,"range_key":10,"string_key":""}}`
 
 	assert.Equal(t, expected, string(a))
 
