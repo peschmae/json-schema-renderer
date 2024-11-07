@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/peschmae/json-schema-renderer/pkg/renderer"
+	util "github.com/peschmae/json-schema-renderer/pkg/schema"
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
@@ -72,9 +73,9 @@ func (a *AsciiDocRenderer) dumpPropertiesToValue(properties map[string]*jsonsche
 
 	var props string
 	if a.flatOutput == "yaml" {
-		props = renderer.DumpPropertiesToYaml(properties)
+		props = util.DumpPropertiesToYaml(properties)
 	} else {
-		props = renderer.DumpPropertiesToJson(properties)
+		props = util.DumpPropertiesToJson(properties)
 	}
 
 	output := "[source," + a.flatOutput + "]\n----\n"

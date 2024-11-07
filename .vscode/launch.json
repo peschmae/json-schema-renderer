@@ -24,7 +24,8 @@
             "console": "integratedTerminal",
             "args": [
                 "test.schema.json",
-                "--required"
+                "--required",
+                "-d=1"
             ]
         },
         {
