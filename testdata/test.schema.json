@@ -1,0 +1,127 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://example.biz/schema/ytt/data-values.json",
+ "type": [
+  "object"
+ ],
+ "properties": {
+  "foo": {
+   "title": "foo",
+   "type": [
+    "object"
+   ],
+   "properties": {
+    "array_key": {
+     "title": "array_key",
+     "type": [
+      "array"
+     ],
+     "items": {
+      "type": [
+       "string"
+      ],
+      "default": ""
+     },
+     "default": [],
+     "minItems": 3,
+     "maxItems": 4
+    },
+    "map_key": {
+     "title": "map_key",
+     "type": [
+      "object"
+     ],
+     "additionalProperties": true,
+     "minProperties": 2,
+     "maxProperties": 5
+    },
+    "max_key": {
+     "title": "max_key",
+     "type": [
+      "integer"
+     ],
+     "default": 10,
+     "maximum": 100
+    },
+    "min_key": {
+     "title": "min_key",
+     "type": [
+      "integer"
+     ],
+     "default": 10
+    },
+    "one_of_integers": {
+     "title": "one_of_integers",
+     "type": [
+      "integer"
+     ],
+     "default": 1,
+     "enum": [
+      1,
+      2,
+      3
+     ]
+    },
+    "one_of_mixed": {
+     "title": "one_of_mixed",
+     "type": [
+      "object",
+      "null"
+     ],
+     "default": "one",
+     "enum": [
+      "one",
+      2,
+      3.3,
+      {}
+     ]
+    },
+    "one_of_strings": {
+     "title": "one_of_strings",
+     "type": [
+      "string"
+     ],
+     "default": "one",
+     "enum": [
+      "one",
+      "two",
+      "three"
+     ]
+    },
+    "range_float_key": {
+     "title": "range_float_key",
+     "type": [
+      "number"
+     ],
+     "default": 2.2,
+     "minimum": -1,
+     "maximum": 100
+    },
+    "range_key": {
+     "title": "range_key",
+     "type": [
+      "integer"
+     ],
+     "default": 10,
+     "maximum": 100
+    },
+    "string_key": {
+     "title": "string_key",
+     "type": [
+      "string"
+     ],
+     "default": "",
+     "minLength": 1,
+     "maxLength": 10
+    }
+   },
+   "additionalProperties": false,
+   "required": [
+    "string_key",
+    "array_key",
+    "map_key"
+   ]
+  }
+ },
+ "additionalProperties": false
+}

@@ -2,6 +2,7 @@
 *.md
 !README.md
 *.schema.json
+!testdata/*.json
 
 json-schema-renderer
 
