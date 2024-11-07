@@ -50,3 +50,43 @@ func TestIsRequiredFalse(t *testing.T) {
 
 	assert.False(t, isRequired(schema.Properties["foo"].Properties["max_key"]))
 }
+
+func TestGatherObjectsRequiredObjectNames(t *testing.T) {
+	c := jsonschema.NewCompiler()
+	schema, err := c.Compile("../../testdata/test.schema.json")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, req := GatherObjects(schema, []string{})
+
+	assert.NotEmpty(t, req)
+
+	expectedRequired := map[string]bool{
+		"foo":              true,
+		"foo > array_key":  true,
+		"foo > map_key":    true,
+		"foo > string_key": true,
+		"map_key":          true,
+	}
+
+	assert.Equal(t, expectedRequired, req)
+}
+
+func TestGatherObjectsObjectsWrapper(t *testing.T) {
+	c := jsonschema.NewCompiler()
+	schema, err := c.Compile("../../testdata/test.schema.json")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	o, _ := GatherObjects(schema, []string{})
+
+	assert.NotEmpty(t, o)
+
+	// not worth building up the whole object structure
+	assert.Equal(t, 2, len(o))
+	assert.Equal(t, 10, len(o["foo"].Properties))
+}
