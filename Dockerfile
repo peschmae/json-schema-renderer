@@ -1,8 +1,10 @@
 FROM golang:alpine as build
 
+ENV CGO_ENABLED=0
+
 WORKDIR /root
 COPY . /root
-RUN go build .
+RUN go build -ldflags="-w -s" .
 
 FROM alpine:latest
 
