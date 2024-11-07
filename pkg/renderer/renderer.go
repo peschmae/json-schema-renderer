@@ -3,7 +3,9 @@ package renderer
 import (
 	"encoding/json"
 	"math"
+	"slices"
 	"strconv"
+	"strings"
 
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
@@ -65,4 +67,65 @@ func getValue(schema jsonschema.Schema) string {
 
 func headerLevel(level int) int {
 	return int(math.Min(6, float64(level+HeaderOffset)))
+}
+
+func RenderDocumentation(r Renderer, objects map[string]jsonschema.Schema, requiredObjectNames map[string]bool, requiredOnly bool, depth int, flatObjects []string) (string, error) {
+
+	output := ""
+
+	// print all schemas
+	// sort keys
+	objectsKeys := make([]string, 0, len(objects))
+	for k := range objects {
+		objectsKeys = append(objectsKeys, k)
+	}
+	slices.Sort(objectsKeys)
+
+	for _, key := range objectsKeys {
+
+		if !requiredOnly || requiredObjectNames[key] {
+
+			if depth == 0 || strings.Count(key, ">") <= depth {
+				output += r.PropertyHeader(key, strings.Count(key, ">")+1)
+
+				if objects[key].Title != "" && objects[key].Description != "" {
+					output += r.TextParagraph("**" + objects[key].Title + ":** " + objects[key].Description)
+				} else if objects[key].Title != "" {
+					output += r.TextParagraph(objects[key].Title)
+				} else if objects[key].Description != "" {
+					output += r.TextParagraph(objects[key].Description)
+				}
+
+				output += r.TableHeader()
+
+				propertyKeys := make([]string, 0, len(objects[key].Properties))
+				for k := range objects[key].Properties {
+					propertyKeys = append(propertyKeys, k)
+				}
+				slices.Sort(propertyKeys)
+
+				for _, s := range propertyKeys {
+
+					dumpValue := strings.Count(key, ">") == depth
+					if slices.Contains(flatObjects, s) {
+						dumpValue = true
+					} else if depth == 0 {
+						// avoid dumping first level objects if depth is 0
+						dumpValue = false
+					}
+
+					if requiredOnly && !requiredObjectNames[key+" > "+s] { // skip non required objects
+						continue
+					}
+
+					output += r.PropertyRow(key, s, *objects[key].Properties[s], dumpValue)
+				}
+
+				output += r.TableFooter()
+				output += "\n"
+			}
+		}
+	}
+
+	return output, nil
 }

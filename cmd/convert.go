@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"slices"
-	"strings"
 
 	"github.com/peschmae/json-schema-renderer/pkg/renderer"
 	util "github.com/peschmae/json-schema-renderer/pkg/schema"
@@ -56,59 +55,12 @@ func renderDoc(input, format, title string, depth int, flatObjects []string) (st
 	output += r.TableFooter()
 	output += "\n"
 
-	// print all schemas
-	// sort keys
-	objectsKeys := make([]string, 0, len(objects))
-	for k := range objects {
-		objectsKeys = append(objectsKeys, k)
+	// print lower level objects
+	out, err := renderer.RenderDocumentation(r, objects, requiredObjectNames, false, depth, flatObjects)
+	if err != nil {
+		return "", err
 	}
-	slices.Sort(objectsKeys)
-
-	for _, key := range objectsKeys {
-
-		if !requiredOnly || requiredObjectNames[key] {
-
-			if depth == 0 || strings.Count(key, ">") <= depth {
-				output += r.PropertyHeader(key, strings.Count(key, ">")+1)
-
-				if objects[key].Title != "" && objects[key].Description != "" {
-					output += r.TextParagraph("**" + objects[key].Title + ":** " + objects[key].Description)
-				} else if objects[key].Title != "" {
-					output += r.TextParagraph(objects[key].Title)
-				} else if objects[key].Description != "" {
-					output += r.TextParagraph(objects[key].Description)
-				}
-
-				output += r.TableHeader()
-
-				propertyKeys := make([]string, 0, len(objects[key].Properties))
-				for k := range objects[key].Properties {
-					propertyKeys = append(propertyKeys, k)
-				}
-				slices.Sort(propertyKeys)
-
-				for _, s := range propertyKeys {
-
-					dumpValue := strings.Count(key, ">") == depth
-					if slices.Contains(flatObjects, s) {
-						dumpValue = true
-					} else if depth == 0 {
-						// avoid dumping first level objects if depth is 0
-						dumpValue = false
-					}
-
-					if requiredOnly && !requiredObjectNames[key+" > "+s] { // skip non required objects
-						continue
-					}
-
-					output += r.PropertyRow(key, s, *objects[key].Properties[s], dumpValue)
-				}
-
-				output += r.TableFooter()
-				output += "\n"
-			}
-		}
-	}
+	output += out
 
 	return output, nil
 }
