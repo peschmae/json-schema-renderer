@@ -77,7 +77,7 @@ func TestGetValue(t *testing.T) {
 	t.Run("array", func(t *testing.T) {
 		v := getValue(*schema.Properties["foo"].Properties["array_key"])
 
-		assert.Equal(t, "[]", v)
+		assert.Equal(t, "[]\n", v)
 	})
 
 	t.Run("bool", func(t *testing.T) {

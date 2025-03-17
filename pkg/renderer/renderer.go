@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"bytes"
 	"encoding/json"
 	"math"
 	"slices"
@@ -41,8 +42,15 @@ func getValue(schema jsonschema.Schema) string {
 			value = strconv.FormatBool((*schema.Default).(bool))
 		case "[array]":
 			if schema.Default != nil {
-				b, _ := json.Marshal((*schema.Default).([]interface{}))
-				value = string(b)
+				buf := new(bytes.Buffer)
+				encoder := json.NewEncoder(buf)
+				encoder.SetIndent("", "  ")
+
+				if err := encoder.Encode((*schema.Default).([]interface{})); err != nil {
+					return ""
+				}
+
+				value = buf.String()
 			} else if schema.Items != nil {
 				s := (schema.Items).(*jsonschema.Schema)
 				if len(s.AnyOf) > 0 {

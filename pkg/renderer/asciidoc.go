@@ -46,8 +46,15 @@ func (a *AsciiDocRenderer) PropertyRow(parent, name string, schema jsonschema.Sc
 	descr := a.escapeText(schema.Description)
 
 	if schema.Types.String() != "[object]" {
+		value := getValue(schema)
 
-		return fmt.Sprintf("|%s |%s |``%s`` |%s\n", name, strings.Join(schema.Types.ToStrings(), ", "), getValue(schema), descr)
+		if strings.Count(value, "\n") > 0 {
+			value = "[source,json]\n----\n" + value + "\n----"
+		} else {
+			value = "``" + a.escapeText(value) + "``"
+		}
+
+		return fmt.Sprintf("|%s |%s |%s |%s\n", name, strings.Join(schema.Types.ToStrings(), ", "), value, descr)
 	}
 
 	// on maxDepth we dump the nested object, but don't link to it
